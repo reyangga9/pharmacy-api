@@ -1,5 +1,3 @@
-﻿# pharmacy-api
-
 # Pharmacy Management System API Documentation
 
 ## Base URL
