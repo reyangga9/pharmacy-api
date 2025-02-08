@@ -245,5 +245,4 @@ PUT /transaction/:id/amount-paid
 - Use valid IDs when making requests that require `id_product`, `id_supplier`, or `transaction ID`.
 - `buy_price` is derived from `sell_price` of the related product.
 
-Let me know if you need further modifications or additional endpoints! 🚀
 
