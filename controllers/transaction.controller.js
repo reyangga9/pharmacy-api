@@ -71,22 +71,42 @@ exports.getAllTransactions = async (req, res) => {
   }
 };
 
-// Get transaction by ID
 exports.getTransactionById = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const transaction = await Transaction.findById(id).populate("id_supplier", "supplier_name");
+    const transaction = await Transaction.findById(id)
+      .populate("id_supplier", "supplier_name")
+      .populate("products.id_product", "product_name"); // Populate product_name from Product model
 
     if (!transaction) {
       return res.status(404).json({ message: "Transaction not found" });
     }
 
-    res.status(200).json(transaction);
+    // Modify the transaction object before sending the response
+    const formattedTransaction = {
+      _id: transaction._id,
+      id_supplier: transaction.id_supplier,
+      purchase_date: transaction.purchase_date,
+      total_qty: transaction.total_qty,
+      total_transaction_price: transaction.total_transaction_price,
+      amount_paid: transaction.amount_paid,
+      is_completed: transaction.is_completed,
+      products: transaction.products.map((product) => ({
+        product_name: product.id_product.product_name,
+        quantity: product.quantity,
+        price_per_unit: product.price_per_unit,
+      })),
+    };
+
+    res.status(200).json(formattedTransaction);
   } catch (error) {
     res.status(500).json({ message: "Error fetching transaction", error: error.message });
   }
 };
+``
+
+
 
 // Update amount_paid
 exports.updateAmountPaid = async (req, res) => {
@@ -109,3 +129,5 @@ exports.updateAmountPaid = async (req, res) => {
     res.status(500).json({ message: "Error updating amount paid", error: error.message });
   }
 };
+
+
