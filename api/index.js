@@ -12,7 +12,7 @@ const app = express();
 
 // Configure CORS to allow requests from your frontend
 app.use(cors({
-  origin: ["http://localhost:5173", "https://your-frontend-domain.com"],
+  origin: ["http://localhost:5173","https://wpharmacy.netlify.app/"],
   methods: "GET,POST,PUT,DELETE",
   allowedHeaders: "Content-Type,Authorization"
 }));
