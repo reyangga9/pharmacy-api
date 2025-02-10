@@ -137,5 +137,4 @@ export default {
   getTransactionById,
   getAllTransactions,
   createTransaction,
-  
 };
