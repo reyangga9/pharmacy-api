@@ -10,7 +10,13 @@ import pharmacy_details from "../routes/pharmacy_item_details.route.js";
 
 const app = express();
 
-app.use(cors());
+// Configure CORS to allow requests from your frontend
+app.use(cors({
+  origin: ["http://localhost:5173", "https://your-frontend-domain.com"],
+  methods: "GET,POST,PUT,DELETE",
+  allowedHeaders: "Content-Type,Authorization"
+}));
+
 app.use(express.json());
 
 app.get("/", (req, res) => {
@@ -24,6 +30,17 @@ app.use("/api/pharmacy_details", pharmacy_details);
 
 // Ensure database connection
 connectDb();
+
+// Handle CORS manually for all routes
+app.use((req, res, next) => {
+  res.header("Access-Control-Allow-Origin", "*"); // Change "*" to specific domains for security
+  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
+  if (req.method === "OPTIONS") {
+    return res.status(200).end();
+  }
+  next();
+});
 
 // Export the app for Vercel
 export default app;
