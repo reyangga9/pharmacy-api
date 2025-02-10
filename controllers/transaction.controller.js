@@ -84,7 +84,7 @@ export const getTransactionById = async (req, res) => {
     const { id } = req.params;
 
     const transaction = await Transaction.findById(id)
-      .populate("id_supplier", "supplier_name")
+      .populate("id_supplier", "supplier_name address")
       .populate("products.id_product", "product_name"); // Populate product_name from Product model
 
     if (!transaction) {
