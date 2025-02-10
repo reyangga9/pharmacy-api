@@ -2,7 +2,6 @@ import Supplier from "../models/supplier.model.js";
 import Product from "../models/product.model.js";
 import SupplierProduct from "../models/supplier.product.models.js";
 
-
 export const getAllSuppliers = async (req, res) => {
   try {
     const suppliers = await Supplier.find();
@@ -91,23 +90,17 @@ export const getAllSuppliersWithProducts = async (req, res) => {
 export const getOneSupplierWithProducts = async (req, res) => {
   try {
     const supplierId = req.params.id;
-
-    // Find the supplier by its ID
     const supplier = await Supplier.findById(supplierId);
-
     if (!supplier) {
       return res.status(404).json({ message: "Supplier not found" });
     }
-
-    // Find the SupplierProduct entries that link to this supplier
     const supplierProducts = await SupplierProduct.find({ id_supplier: supplierId })
       .populate({
         path: "id_product",
         select: "product_name sell_price"
       });
-
     const response = {
-      _id :supplier._id,
+      _id: supplier._id,
       name: supplier.supplier_name,
       address: supplier.address,
       phone: supplier.phone_number,
@@ -115,21 +108,51 @@ export const getOneSupplierWithProducts = async (req, res) => {
         _id: supplierProduct.id_product._id,
         name: supplierProduct.id_product.product_name,
         price: supplierProduct.id_product.sell_price
-
       }))
     };
-
     res.status(200).json(response);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
 
+export const addNewSupplierWithProducts = async (req, res) => {
+  try {
+    const { supplier_name, address, phone_number, products } = req.body;
+
+    // Create new supplier
+    const newSupplier = new Supplier({ supplier_name, address, phone_number });
+    await newSupplier.save();
+
+    // Create new products
+    const createdProducts = await Product.insertMany(products);
+
+    // Create SupplierProduct entries
+    const supplierProducts = createdProducts.map(product => ({
+      id_supplier: newSupplier._id,
+      id_product: product._id
+    }));
+
+    await SupplierProduct.insertMany(supplierProducts);
+
+    res.status(201).json({
+      message: "New supplier and products added successfully",
+      supplier: newSupplier,
+      products: createdProducts
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+
+
+
 export default {
   getAllSuppliers,
   addSupplier,
   addProductToSupplier,
   getAllSuppliersWithProducts,
-  getOneSupplierWithProducts
+  getOneSupplierWithProducts,
+  addNewSupplierWithProducts
 };
-

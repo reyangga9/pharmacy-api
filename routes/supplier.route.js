@@ -20,6 +20,9 @@ router.post("/add-supplier", supplierController.addSupplier);
 // tambah product di supplier
 router.post("/add-product", supplierController.addProductToSupplier);
 
+//tambah supplier dengan products
+
+router.post("/add-supplier-products",supplierController.addNewSupplierWithProducts)
 
 
 
