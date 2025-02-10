@@ -1,6 +1,5 @@
 import Transaction from "../models/transaction.model.js";
 import Supplier from "../models/supplier.model.js";
-import Product from "../models/product.model.js";
 import SupplierProduct from "../models/supplier.product.models.js";
 import PharmacyItemDetails from "../models/pharmacy_item_detail.model.js";
 
@@ -8,8 +7,9 @@ import PharmacyItemDetails from "../models/pharmacy_item_detail.model.js";
 export const createTransaction = async (req, res) => {
   try {
     const { id_supplier, products, amount_paid } = req.body;
-    
-    const supplier = await Supplier.findById(id_supplier);3
+
+    // Check if the supplier exists
+    const supplier = await Supplier.findById(id_supplier);
     if (!supplier) {
       return res.status(404).json({ message: "Supplier not found" });
     }
@@ -20,6 +20,7 @@ export const createTransaction = async (req, res) => {
     for (let item of products) {
       const { id_product, quantity, price_per_unit } = item;
 
+      // Check if the product is supplied by the supplier
       const supplierProduct = await SupplierProduct.findOne({ id_supplier, id_product });
       if (!supplierProduct) {
         return res.status(400).json({
@@ -30,6 +31,7 @@ export const createTransaction = async (req, res) => {
       total_transaction_price += quantity * price_per_unit;
       validatedProducts.push({ id_product, quantity, price_per_unit });
 
+      // Check if the product exists in PharmacyItemDetails, update or create accordingly
       const existingItem = await PharmacyItemDetails.findOne({ id_product });
 
       if (existingItem) {
@@ -47,10 +49,14 @@ export const createTransaction = async (req, res) => {
 
     const is_completed = amount_paid >= total_transaction_price;
 
+    // ✅ Initialize the payment history with the first payment
+    const amount_paid_history = amount_paid > 0 ? [{ amount: amount_paid, date: new Date() }] : [];
+
     const transaction = new Transaction({
       id_supplier,
       products: validatedProducts,
       amount_paid,
+      amount_paid_history, // Store initial payment history
       total_transaction_price,
       is_completed,
     });
@@ -61,6 +67,7 @@ export const createTransaction = async (req, res) => {
     res.status(500).json({ message: "Error creating transaction", error: error.message });
   }
 };
+
 
 export const getAllTransactions = async (req, res) => {
   try {
@@ -92,6 +99,10 @@ export const getTransactionById = async (req, res) => {
       total_qty: transaction.total_qty,
       total_transaction_price: transaction.total_transaction_price,
       amount_paid: transaction.amount_paid,
+      amount_paid_history: transaction.amount_paid_history.map((history) => ({
+        amount: history.amount,
+        date: history.date,
+      })),
       is_completed: transaction.is_completed,
       products: transaction.products.map((product) => ({
         product_name: product.id_product.product_name,
@@ -105,11 +116,12 @@ export const getTransactionById = async (req, res) => {
     res.status(500).json({ message: "Error fetching transaction", error: error.message });
   }
 };
-``
 
 
 
-// Update amount_paid
+
+
+
 export const updateAmountPaid = async (req, res) => {
   try {
     const { id } = req.params;
@@ -120,16 +132,26 @@ export const updateAmountPaid = async (req, res) => {
       return res.status(404).json({ message: "Transaction not found" });
     }
 
-    transaction.amount_paid = amount_paid;
-    transaction.is_completed = amount_paid >= transaction.total_transaction_price;
+  
+    transaction.amount_paid_history.push({ amount: amount_paid });
+
+
+    transaction.amount_paid += amount_paid;
+
+
+    transaction.is_completed = transaction.amount_paid >= transaction.total_transaction_price;
 
     await transaction.save();
 
-    res.status(200).json({ message: "Amount paid updated successfully", transaction });
+    res.status(200).json({
+      message: "Amount paid updated successfully",
+      transaction,
+    });
   } catch (error) {
     res.status(500).json({ message: "Error updating amount paid", error: error.message });
   }
 };
+
 
 
 export default {

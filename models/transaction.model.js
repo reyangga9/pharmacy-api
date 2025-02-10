@@ -7,15 +7,22 @@ const TransactionSchema = new mongoose.Schema({
     {
       id_product: { type: mongoose.Schema.Types.ObjectId, ref: "Product", required: true },
       quantity: { type: Number, required: true },
-      price_per_unit: { type: Number, required: true }
-    }
+      price_per_unit: { type: Number, required: true },
+    },
   ],
   amount_paid: { type: Number, default: 0 },
+  amount_paid_history: [
+    {
+      amount: { type: Number, required: true },
+      date: { type: Date, default: Date.now },
+    },
+  ],
   total_qty: { type: Number },
   total_transaction_price: { type: Number },
-  is_completed: { type: Boolean, default: false }
+  is_completed: { type: Boolean, default: false },
 });
 
+// Calculate total quantity and total price before saving
 TransactionSchema.pre("validate", function (next) {
   this.total_qty = this.products.reduce((sum, item) => sum + item.quantity, 0);
   this.total_transaction_price = this.products.reduce(
