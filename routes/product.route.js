@@ -1,11 +1,11 @@
-const express = require("express");
+import express from "express";
 const router = express.Router();
-const productController = require("../controllers/product.controller");
+import productController from "../controllers/product.controller.js";
+
 
 //  Route untuk menambahkan produk
 router.post("/add", productController.addProduct);
 router.post("/addBulk", productController.addProductsBulk);
 router.get("/",productController.getAllProducts)
 
-
-module.exports = router;
+export default router;

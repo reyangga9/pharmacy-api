@@ -1,10 +1,11 @@
-const Transaction = require("../models/transaction.model");
-const Supplier = require("../models/supplier.model");
-const Product = require("../models/product.model");
-const SupplierProduct = require("../models/supplier.product.models");
-const PharmacyItemDetails = require("../models/pharmacy_item_detail.model");
+import Transaction from "../models/transaction.model.js";
+import Supplier from "../models/supplier.model.js";
+import Product from "../models/product.model.js";
+import SupplierProduct from "../models/supplier.product.models.js";
+import PharmacyItemDetails from "../models/pharmacy_item_detail.model.js";
 
-exports.createTransaction = async (req, res) => {
+
+export const createTransaction = async (req, res) => {
   try {
     const { id_supplier, products, amount_paid } = req.body;
     
@@ -61,7 +62,7 @@ exports.createTransaction = async (req, res) => {
   }
 };
 
-exports.getAllTransactions = async (req, res) => {
+export const getAllTransactions = async (req, res) => {
   try {
     const transactions = await Transaction.find().populate("id_supplier", "supplier_name");
 
@@ -71,7 +72,7 @@ exports.getAllTransactions = async (req, res) => {
   }
 };
 
-exports.getTransactionById = async (req, res) => {
+export const getTransactionById = async (req, res) => {
   try {
     const { id } = req.params;
 
@@ -109,7 +110,7 @@ exports.getTransactionById = async (req, res) => {
 
 
 // Update amount_paid
-exports.updateAmountPaid = async (req, res) => {
+export const updateAmountPaid = async (req, res) => {
   try {
     const { id } = req.params;
     const { amount_paid } = req.body;
@@ -131,3 +132,10 @@ exports.updateAmountPaid = async (req, res) => {
 };
 
 
+export default {
+  updateAmountPaid,
+  getTransactionById,
+  getAllTransactions,
+  createTransaction,
+  
+};

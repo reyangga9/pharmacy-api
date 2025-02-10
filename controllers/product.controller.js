@@ -1,6 +1,6 @@
-const Product = require("../models/product.model");
+import Product from "../models/product.model.js";
 
-exports.addProduct = async (req, res) => {
+export const addProduct = async (req, res) => {
     try {
         const { product_name, sell_price } = req.body;
 
@@ -24,7 +24,7 @@ exports.addProduct = async (req, res) => {
     }
 };
 
-exports.addProductsBulk = async (req, res) => {
+export const addProductsBulk = async (req, res) => {
     try {
         const products = req.body;
 
@@ -74,7 +74,7 @@ exports.addProductsBulk = async (req, res) => {
     }
 };
 
-exports.getAllProducts = async (req, res) => {
+export const getAllProducts = async (req, res) => {
     try {
         const products = await Product.find();
         res.status(201).json({ message: "", product: products });
@@ -82,3 +82,8 @@ exports.getAllProducts = async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 };
+
+
+export default {
+    getAllProducts,addProductsBulk,addProduct
+  };

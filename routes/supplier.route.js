@@ -1,7 +1,8 @@
-const express = require("express");
+import express from "express";
 const router = express.Router();
 
-const supplierController = require("../controllers/supplier.controller")
+import supplierController from "../controllers/supplier.controller.js";
+
 
 
 // Ambil semua supplier
@@ -22,5 +23,4 @@ router.post("/add-product", supplierController.addProductToSupplier);
 
 
 
-
-module.exports = router;
+export default router;

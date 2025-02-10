@@ -1,8 +1,8 @@
-const express = require("express");
+import express from "express";
+import pharmacy_item_details from "../controllers/pharmacy_item_details.js";
+
 const router = express.Router();
-const pharmacy_item_details = require("../controllers/pharmacy_item_details");
 
-// router.get("/pharmacy-item-details", pharmacy_item_details.getAllPharmacyItemDetails);
-router.get("/",pharmacy_item_details.getAllPharmacyItemDetails)
+router.get("/", pharmacy_item_details.getAllPharmacyItemDetails);
 
-module.exports = router;
+export default router;

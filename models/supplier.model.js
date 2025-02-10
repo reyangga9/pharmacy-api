@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
 const SupplierSchema = new mongoose.Schema({
   supplier_name: { type: String, required: true },
@@ -6,4 +6,4 @@ const SupplierSchema = new mongoose.Schema({
   phone_number: { type: String, required: true },
 });
 
-module.exports = mongoose.model("Supplier", SupplierSchema);
+export default mongoose.model("Supplier", SupplierSchema);

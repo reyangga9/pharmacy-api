@@ -1,8 +1,9 @@
-const Supplier = require("../models/supplier.model");
-const Product = require("../models/product.model");
-const SupplierProduct = require("../models/supplier.product.models");
+import Supplier from "../models/supplier.model.js";
+import Product from "../models/product.model.js";
+import SupplierProduct from "../models/supplier.product.models.js";
 
-exports.getAllSuppliers = async (req, res) => {
+
+export const getAllSuppliers = async (req, res) => {
   try {
     const suppliers = await Supplier.find();
     res.status(200).json(suppliers);
@@ -11,7 +12,7 @@ exports.getAllSuppliers = async (req, res) => {
   }
 };
 
-exports.addSupplier = async (req, res) => {
+export const addSupplier = async (req, res) => {
   try {
     const { supplier_name, address, phone_number } = req.body;
     const newSupplier = new Supplier({
@@ -26,7 +27,7 @@ exports.addSupplier = async (req, res) => {
   }
 };
 
-exports.addProductToSupplier = async (req, res) => {
+export const addProductToSupplier = async (req, res) => {
   try {
     const { id_supplier, id_product } = req.body;
 
@@ -52,7 +53,7 @@ exports.addProductToSupplier = async (req, res) => {
   }
 };
 
-exports.getAllSuppliersWithProducts = async (req, res) => {
+export const getAllSuppliersWithProducts = async (req, res) => {
   try {
     const suppliersWithProducts = await Supplier.aggregate([
       {
@@ -87,7 +88,7 @@ exports.getAllSuppliersWithProducts = async (req, res) => {
   }
 };
 
-exports.getOneSupplierWithProducts = async (req, res) => {
+export const getOneSupplierWithProducts = async (req, res) => {
   try {
     const supplierId = req.params.id;
 
@@ -124,4 +125,11 @@ exports.getOneSupplierWithProducts = async (req, res) => {
   }
 };
 
+export default {
+  getAllSuppliers,
+  addSupplier,
+  addProductToSupplier,
+  getAllSuppliersWithProducts,
+  getOneSupplierWithProducts
+};
 

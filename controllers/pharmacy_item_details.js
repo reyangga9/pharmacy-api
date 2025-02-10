@@ -1,7 +1,7 @@
-const PharmacyItemDetails = require("../models/pharmacy_item_detail.model");
-const Product = require("../models/product.model");
+import PharmacyItemDetails from "../models/pharmacy_item_detail.model.js";
+import Product from "../models/product.model.js";
 
-exports.getAllPharmacyItemDetails = async (req, res) => {
+export const getAllPharmacyItemDetails = async (req, res) => {
   try {
     const pharmacyItems = await PharmacyItemDetails.find().populate("id_product", "product_name sell_price");
 
@@ -18,4 +18,8 @@ exports.getAllPharmacyItemDetails = async (req, res) => {
   } catch (error) {
     res.status(500).json({ message: "Error fetching pharmacy item details", error: error.message });
   }
+};
+
+export default {
+  getAllPharmacyItemDetails
 };
