@@ -71,7 +71,8 @@ export const createTransaction = async (req, res) => {
 
 export const getAllTransactions = async (req, res) => {
   try {
-    const transactions = await Transaction.find().populate("id_supplier", "supplier_name");
+    const transactions = await Transaction.find().populate("id_supplier", "supplier_name").sort({ purchase_date: -1 }); // Sort by newest transaction first;
+    
 
     res.status(200).json(transactions);
   } catch (error) {
