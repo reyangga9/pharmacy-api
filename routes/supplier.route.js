@@ -24,6 +24,9 @@ router.post("/add-product", supplierController.addProductToSupplier);
 
 router.post("/add-supplier-products",supplierController.addNewSupplierWithProducts)
 
+router.delete("/:id/delete-supplier", supplierController.deleteSupplierById)
+
+router.put("/:id/edit-supplier", supplierController.editSupplierById)
 
 
 export default router;

@@ -52,6 +52,22 @@ export const addProductToSupplier = async (req, res) => {
   }
 };
 
+export const deleteSupplierById = async (req,res) =>{
+  try {
+    const { id } = req.params;
+
+    const deletedSupplier = await Supplier.findByIdAndDelete(id);
+
+    if (!deletedSupplier) {
+      return res.status(404).json({ message: "Supplier not found" });
+    }
+
+    res.status(200).json({ message: "Supplier deleted successfully" });
+  } catch (error) {
+    res.status(500).json({ message: "Error deleting supplier", error: error.message });
+  }
+}
+
 export const getAllSuppliersWithProducts = async (req, res) => {
   try {
     const suppliersWithProducts = await Supplier.aggregate([
@@ -145,6 +161,56 @@ export const addNewSupplierWithProducts = async (req, res) => {
   }
 };
 
+// Edit supplier details & products
+export const editSupplierById = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { supplier_name, address, phone_number, products } = req.body;
+
+    // Find the supplier
+    const supplier = await Supplier.findById(id);
+    if (!supplier) {
+      return res.status(404).json({ message: "Supplier not found" });
+    }
+
+    // Update supplier details
+    supplier.supplier_name = supplier_name || supplier.supplier_name;
+    supplier.address = address || supplier.address;
+    supplier.phone_number = phone_number || supplier.phone_number;
+    await supplier.save();
+
+    // Remove existing supplier-product relations
+    await SupplierProduct.deleteMany({ id_supplier: id });
+
+    // Add new supplier-product relations
+    if (products && products.length > 0) {
+      const supplierProducts = products.map((product) => ({
+        id_supplier: id,
+        id_product: product._id,
+      }));
+      await SupplierProduct.insertMany(supplierProducts);
+    }
+
+    // Fetch updated supplier details with products
+    const updatedSupplier = await Supplier.findById(id);
+    const updatedProducts = await SupplierProduct.find({ id_supplier: id }).populate({
+      path: "id_product",
+      select: "product_name sell_price",
+    });
+
+    res.status(200).json({
+      message: "Supplier updated successfully",
+      supplier: updatedSupplier,
+      products: updatedProducts.map((sp) => ({
+        _id: sp.id_product._id,
+        name: sp.id_product.product_name,
+        price: sp.id_product.sell_price,
+      })),
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Error updating supplier", error: error.message });
+  }
+};
 
 
 
@@ -154,5 +220,5 @@ export default {
   addProductToSupplier,
   getAllSuppliersWithProducts,
   getOneSupplierWithProducts,
-  addNewSupplierWithProducts
+  addNewSupplierWithProducts,deleteSupplierById,editSupplierById
 };
