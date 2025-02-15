@@ -7,11 +7,11 @@ export const getAllPharmacyItemDetails = async (req, res) => {
 
     const formattedItems = pharmacyItems.map((item) => ({
       _id: item._id,
-      id_product: item.id_product._id,
-      product_name: item.id_product.product_name, 
+      id_product: item.id_product?._id, // ✅ Ensure it does not crash if undefined
+      product_name: item.id_product?.product_name || "Unknown", // ✅ Handle missing product
       total_quantity: item.total_quantity,
-      sell_price: item.sell_price, 
-      buy_price: item.id_product.sell_price, 
+      sell_price: item.sell_price,
+      buy_price: item.id_product?.sell_price || 0, // ✅ Handle missing sell_price
     }));
 
     res.status(200).json(formattedItems);

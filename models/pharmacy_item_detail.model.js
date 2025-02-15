@@ -1,7 +1,8 @@
 import mongoose from "mongoose";
 
 const PharmacyItemDetailsSchema = new mongoose.Schema({
-  id_product: { type: mongoose.Schema.Types.ObjectId, ref: "Product", required: true },
+  _id: { type: String, required: true }, // ✅ Make _id same as id_product
+  id_product: { type: String, ref: "Product", required: true }, // ✅ Add reference to Product
   total_quantity: { type: Number, required: true },
   sell_price: { type: Number, required: true }
 });

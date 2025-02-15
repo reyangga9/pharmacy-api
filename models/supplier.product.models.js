@@ -1,8 +1,8 @@
 import mongoose from "mongoose";
 
-const SupplierProductSchema = new mongoose.Schema({
-  id_supplier: { type: mongoose.Schema.Types.ObjectId, required: true, ref: "Supplier" },
-  id_product: { type: mongoose.Schema.Types.ObjectId, required: true, ref: "Product" }
+const supplierProductSchema = new mongoose.Schema({
+  id_supplier: { type: String, required: true }, // Changed to String
+  id_product: { type: String, ref: "Product", required: true } // Changed to String
 });
 
-export default mongoose.model("SupplierProduct", SupplierProductSchema);
+export default mongoose.model("SupplierProduct", supplierProductSchema);

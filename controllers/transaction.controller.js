@@ -32,7 +32,7 @@ export const createTransaction = async (req, res) => {
       validatedProducts.push({ id_product, quantity, price_per_unit });
 
       // Check if the product exists in PharmacyItemDetails, update or create accordingly
-      const existingItem = await PharmacyItemDetails.findOne({ id_product });
+      let existingItem = await PharmacyItemDetails.findOne({ id_product });
 
       if (existingItem) {
         existingItem.total_quantity += quantity;
@@ -40,7 +40,8 @@ export const createTransaction = async (req, res) => {
         await existingItem.save();
       } else {
         await PharmacyItemDetails.create({
-          id_product,
+          _id: id_product, // ✅ Set _id to be the same as id_product
+          id_product, // ✅ Ensure id_product is provided
           total_quantity: quantity,
           sell_price: price_per_unit,
         });
@@ -52,11 +53,21 @@ export const createTransaction = async (req, res) => {
     // ✅ Initialize the payment history with the first payment
     const amount_paid_history = amount_paid > 0 ? [{ amount: amount_paid, date: new Date() }] : [];
 
+    // ✅ Generate a custom _id (e.g., T001, T002, ...)
+    const lastTransaction = await Transaction.findOne().sort({ _id: -1 });
+    let transactionId = "T001"; 
+
+    if (lastTransaction && lastTransaction._id.startsWith("T")) {
+      const lastIdNumber = parseInt(lastTransaction._id.substring(1)); 
+      transactionId = `T${String(lastIdNumber + 1).padStart(3, "0")}`;
+    }
+
     const transaction = new Transaction({
+      _id: transactionId,
       id_supplier,
       products: validatedProducts,
       amount_paid,
-      amount_paid_history, // Store initial payment history
+      amount_paid_history,
       total_transaction_price,
       is_completed,
     });
@@ -67,6 +78,9 @@ export const createTransaction = async (req, res) => {
     res.status(500).json({ message: "Error creating transaction", error: error.message });
   }
 };
+
+
+
 
 
 export const getAllTransactions = async (req, res) => {
