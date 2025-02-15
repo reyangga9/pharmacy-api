@@ -5,7 +5,7 @@ import SupplierProduct from "../models/supplier.product.models.js";
 export const getAllSuppliers = async (req, res) => {
   try {
     const suppliers = await Supplier.find();
-    console.log(suppliers)
+
     res.status(200).json(suppliers);
   } catch (error) {
     res.status(500).json({ message: error.message });

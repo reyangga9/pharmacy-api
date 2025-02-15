@@ -4,7 +4,7 @@ let isConnected = false; // Track DB connection state
 
 export const connectDb = async () => {
   if (isConnected) {
-    console.log("Using existing database connection");
+   
     return;
   }
 
@@ -14,7 +14,7 @@ export const connectDb = async () => {
       useUnifiedTopology: true,
     });
     isConnected = true;
-    console.log("Connected to database");
+ 
   } catch (e) {
     console.log("Failed to connect to database:", e);
   }
