@@ -7,7 +7,7 @@ import supplier from "../routes/supplier.route.js";
 import product from "../routes/product.route.js";
 import transaction from "../routes/transaction.route.js";
 import pharmacy_details from "../routes/pharmacy_item_details.route.js";
-
+import userRoutes from "../routes/user.route.js";
 const app = express();
 
 // Configure CORS to allow requests from your frontend
