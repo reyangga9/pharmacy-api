@@ -2,31 +2,24 @@ import express from "express";
 const router = express.Router();
 
 import supplierController from "../controllers/supplier.controller.js";
+import { authenticateUser } from "../middlewares/auth.js";
+import { authorizeRole } from "../middlewares/role.js";
 
+router.use(authenticateUser); // 🔥 Now only affects routes BELOW this line
 
-
-// Ambil semua supplier
+// ✅ Public Routes (No authentication required)
 router.get("/", supplierController.getAllSuppliers);
-
-// Ambil semua supplier dengan product
 router.get("/product", supplierController.getAllSuppliersWithProducts);
-
-// ambil 1 supplier aja dengan product
 router.get("/:id/product", supplierController.getOneSupplierWithProducts);
 
-//Tambahh supplier aja
-router.post("/add-supplier", supplierController.addSupplier);
+// ✅ Protected Routes (Require authentication)
 
-// tambah product di supplier
-router.post("/add-product", supplierController.addProductToSupplier);
 
-//tambah supplier dengan products
-
-router.post("/add-supplier-products",supplierController.addNewSupplierWithProducts)
-
-router.delete("/:id/delete-supplier", supplierController.deleteSupplierById)
-
-router.put("/:id/edit-supplier", supplierController.editSupplierById)
-
+// Only Manager (role = 1) can modify suppliers
+router.post("/add-supplier", authorizeRole([1]), supplierController.addSupplier);
+router.post("/add-product", authorizeRole([1]), supplierController.addProductToSupplier);
+router.post("/add-supplier-products", authorizeRole([1]), supplierController.addNewSupplierWithProducts);
+router.put("/:id/edit-supplier", authorizeRole([1]), supplierController.editSupplierById);
+router.delete("/:id/delete-supplier", authorizeRole([1]), supplierController.deleteSupplierById);
 
 export default router;

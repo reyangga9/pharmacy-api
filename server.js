@@ -8,14 +8,17 @@ import supplier from "./routes/supplier.route.js";
 import product from "./routes/product.route.js"
 import transaction from "./routes/transaction.route.js"
 import pharmacy_details from "./routes/pharmacy_item_details.route.js"
+import userRoutes from "./routes/user.route.js";
 
 const app = express();
 const port = process.env.PORT || 3000;
 
 app.use(cors());
-
-// app.use(cookieParser());
 app.use(express.json());
+app.use((req, res, next) => {
+  console.log("Incoming Headers:", req.headers); // 🔍 Debug headers
+  next();
+});
 
 app.get("/", (req, res) => {
   res.send("Hello World!");
@@ -25,8 +28,9 @@ app.use("/api/supplier",supplier)
 app.use("/api/product",product)
 app.use("/api/transaction",transaction)
 app.use("/api/pharmacy_details",pharmacy_details)
+app.use("/api/users", userRoutes);
 
 app.listen(port, () => {
   connectDb();
-  console.log(`server berjalanan di port ${port}`);
+
 });
