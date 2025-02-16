@@ -246,67 +246,69 @@ export const editSupplierById = async (req, res) => {
     const { id } = req.params;
     const { supplier_name, address, phone_number, products } = req.body;
 
-    // Find the supplier
+    // ✅ Find the supplier
     const supplier = await Supplier.findById(id);
     if (!supplier) {
       return res.status(404).json({ message: "Supplier not found" });
     }
 
-    // Update supplier details
+    // ✅ Update supplier details
     supplier.supplier_name = supplier_name || supplier.supplier_name;
     supplier.address = address || supplier.address;
     supplier.phone_number = phone_number || supplier.phone_number;
     await supplier.save();
 
-    // Remove existing supplier-product relations
+    // ✅ Remove existing supplier-product relations
     await SupplierProduct.deleteMany({ id_supplier: id });
 
-    // Add new supplier-product relations
-    const supplierProducts = [];
-
-    if (products && products.length > 0) {
-      for (const product of products) {
+    // ✅ Process Products (Reuse existing, create if new)
+    const updatedProducts = await Promise.all(
+      products.map(async (product, index) => {
         let existingProduct = await Product.findOne({ product_name: product.name });
 
         if (!existingProduct) {
-          // Create a new product if it doesn't exist
+          // ✅ Auto-generate `_id` for new Products
+          const lastProduct = await Product.findOne().sort({ _id: -1 });
+
+          let lastProductNumber = 0;
+          if (lastProduct && /^P\d+$/.test(lastProduct._id)) {
+            lastProductNumber = parseInt(lastProduct._id.substring(1), 10);
+          }
+
+          let productId = `P${(lastProductNumber + index + 1).toString().padStart(3, "0")}`;
           existingProduct = new Product({
+            _id: productId,
             product_name: product.name,
-            sell_price: product.price,
+            sell_price: product.price
           });
+
           await existingProduct.save();
         }
 
-        // Create a new supplier-product relation
-        supplierProducts.push({
+        // ✅ Create a new supplier-product relation
+        await SupplierProduct.create({
           id_supplier: id,
-          id_product: existingProduct._id,
+          id_product: existingProduct._id
         });
-      }
 
-      await SupplierProduct.insertMany(supplierProducts);
-    }
-
-    // Fetch updated supplier details with products
-    const updatedSupplier = await Supplier.findById(id);
-    const updatedProducts = await SupplierProduct.find({ id_supplier: id }).populate({
-      path: "id_product",
-      select: "product_name sell_price",
-    });
+        return {
+          _id: existingProduct._id,
+          name: existingProduct.product_name,
+          price: existingProduct.sell_price
+        };
+      })
+    );
 
     res.status(200).json({
       message: "Supplier updated successfully",
-      supplier: updatedSupplier,
-      products: updatedProducts.map((sp) => ({
-        _id: sp.id_product._id, // Existing ID if name matches, new ID otherwise
-        name: sp.id_product.product_name,
-        price: sp.id_product.sell_price,
-      })),
+      supplier,
+      products: updatedProducts
     });
   } catch (error) {
     res.status(500).json({ message: "Error updating supplier", error: error.message });
   }
 };
+
 
 
 

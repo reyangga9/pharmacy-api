@@ -38,6 +38,7 @@ export const createUser = async (req, res) => {
 };
 
 // User Login & Generate JWT
+
 export const loginUser = async (req, res) => {
   try {
     const { username, password } = req.body;
@@ -56,9 +57,15 @@ export const loginUser = async (req, res) => {
 
     // Generate JWT Token
     const token = jwt.sign({ id: user._id, role: user.role }, JWT_SECRET, { expiresIn: "1h" });
-    console.log('test')
 
-    res.status(200).json({ message: "Login successful", token });
+    // Send response with token & role
+    res.status(200).json({ 
+      message: "Login successful", 
+      token, 
+      username: user.username, // ✅ Properly include username
+      role: user.role // ✅ Include role in response
+    });
+    
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
