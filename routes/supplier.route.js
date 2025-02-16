@@ -5,7 +5,7 @@ import supplierController from "../controllers/supplier.controller.js";
 import { authenticateUser } from "../middlewares/auth.js";
 import { authorizeRole } from "../middlewares/role.js";
 
-router.use(authenticateUser); // 🔥 Now only affects routes BELOW this line
+
 
 // ✅ Public Routes (No authentication required)
 router.get("/", supplierController.getAllSuppliers);
@@ -14,7 +14,7 @@ router.get("/:id/product", supplierController.getOneSupplierWithProducts);
 
 // ✅ Protected Routes (Require authentication)
 
-
+router.use(authenticateUser); // 🔥 Now only affects routes BELOW this line
 // Only Manager (role = 1) can modify suppliers
 router.post("/add-supplier", authorizeRole([1]), supplierController.addSupplier);
 router.post("/add-product", authorizeRole([1]), supplierController.addProductToSupplier);

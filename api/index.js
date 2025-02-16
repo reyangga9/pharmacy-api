@@ -27,6 +27,7 @@ app.use("/api/supplier", supplier);
 app.use("/api/product", product);
 app.use("/api/transaction", transaction);
 app.use("/api/pharmacy_details", pharmacy_details);
+app.use("/api/users", userRoutes);
 
 // Ensure database connection
 connectDb();
