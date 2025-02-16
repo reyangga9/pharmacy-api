@@ -54,6 +54,7 @@ export const loginUser = async (req, res) => {
     if (!isMatch) {
       return res.status(400).json({ message: "Invalid username or password." });
     }
+    console.log("JWT_SECRET:", process.env.JWT_SECRET);
 
     // Generate JWT Token
     const token = jwt.sign({ id: user._id, role: user.role }, JWT_SECRET, { expiresIn: "1h" });
